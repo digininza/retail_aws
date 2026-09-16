@@ -1,0 +1,12 @@
+customer_id,name,email,segment,city
+CUST-0001,Asha Mehta,asha.mehta@example.com,LOYALTY,Delhi
+CUST-0002,Rohan Kapoor,rohan.kapoor@example.com,STANDARD,Mumbai
+CUST-0003,Priya Nair,priya.nair@example.com,LOYALTY,Bengaluru
+CUST-0004,Vikram Rao,vikram.rao@example.com,STANDARD,Chennai
+CUST-0005,Sneha Iyer,sneha.iyer@example.com,PREMIUM,Pune
+CUST-0006,Arjun Singh,arjun.singh@example.com,STANDARD,Delhi
+CUST-0007,Kavya Reddy,kavya.reddy@example.com,LOYALTY,Hyderabad
+CUST-0008,Manish Gupta,manish.gupta@example.com,STANDARD,Jaipur
+CUST-0009,Divya Shah,divya.shah@example.com,PREMIUM,Ahmedabad
+CUST-0010,Karan Verma,karan.verma@example.com,STANDARD,Lucknow
+CUST-0011,Neha Joshi,neha.joshi@example.com,LOYALTY,Pune

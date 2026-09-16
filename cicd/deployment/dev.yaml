@@ -1,0 +1,10 @@
+# Dev deployment parameters consumed by the DeployDev pipeline stage.
+environment: dev
+account_id: "000000000000"
+region: us-east-1
+approval_required: false
+smoke_test_required: true
+cloudformation_stack_name: retail-dev-data-lake
+glue_job_config: infrastructure/glue/glue-job-definitions.json
+mwaa_dags_bucket: retail-dev-mwaa-dags
+rollback_on_failure: true

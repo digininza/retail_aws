@@ -1,0 +1,32 @@
+{
+  "_comment": "EXAMPLE S3 lifecycle policy (Section 5, Section 34 cost optimization). raw/ is immutable but not infinite: after a retention window it moves to Glacier via archive/ rather than being deleted, preserving replay capability at lower cost.",
+  "Rules": [
+    {
+      "ID": "raw-to-infrequent-access",
+      "Status": "Enabled",
+      "Filter": {"Prefix": "raw/"},
+      "Transitions": [
+        {"Days": 30, "StorageClass": "STANDARD_IA"},
+        {"Days": 90, "StorageClass": "GLACIER"}
+      ]
+    },
+    {
+      "ID": "quarantine-expire-after-investigation-window",
+      "Status": "Enabled",
+      "Filter": {"Prefix": "quarantine/"},
+      "Expiration": {"Days": 60}
+    },
+    {
+      "ID": "archive-deep-glacier",
+      "Status": "Enabled",
+      "Filter": {"Prefix": "archive/"},
+      "Transitions": [{"Days": 1, "StorageClass": "DEEP_ARCHIVE"}]
+    },
+    {
+      "ID": "abort-incomplete-multipart-uploads",
+      "Status": "Enabled",
+      "Filter": {"Prefix": ""},
+      "AbortIncompleteMultipartUpload": {"DaysAfterInitiation": 7}
+    }
+  ]
+}

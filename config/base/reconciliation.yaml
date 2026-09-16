@@ -1,0 +1,145 @@
+# Reconciliation profiles (Section 12). Referenced by `reconciliation_profile`
+# in sources.yaml. Distinct from DQ: DQ asks "is the data valid?",
+# reconciliation asks "did we move/process the expected data correctly?".
+
+profiles:
+
+  orders_daily:
+    checks:
+      - type: RECORD_COUNT
+        source: sqlserver.orders
+        target: redshift.stg_orders
+        tolerance_pct: 0
+      - type: AGGREGATE
+        column: amount
+        agg: SUM
+        source: sqlserver.orders
+        target: redshift.stg_orders
+        tolerance_pct: 0.01
+      - type: PARTITION_DATE
+        column: order_date
+        tolerance_pct: 0
+
+  order_items_daily:
+    checks:
+      - type: RECORD_COUNT
+        source: sqlserver.order_items
+        target: redshift.stg_order_items
+        tolerance_pct: 0
+      - type: AGGREGATE
+        column: unit_price
+        agg: SUM
+        source: sqlserver.order_items
+        target: redshift.stg_order_items
+        tolerance_pct: 0.01
+
+  customers_daily:
+    checks:
+      - type: KEY_RECONCILIATION
+        key: customer_id
+        source: sqlserver.customers_cdc
+        target: redshift.dim_customer
+        tolerance_pct: 0
+
+  stores_daily:
+    checks:
+      - type: RECORD_COUNT
+        source: sqlserver.stores
+        target: redshift.dim_store
+        tolerance_pct: 0
+
+  promotions_daily:
+    checks:
+      - type: RECORD_COUNT
+        source: sqlserver.promotions
+        target: redshift.dim_promotion
+        tolerance_pct: 0
+
+  product_master_daily:
+    checks:
+      - type: RECORD_COUNT
+        source: sap.product_master
+        target: redshift.dim_product
+        tolerance_pct: 0
+
+  vendor_master_daily:
+    checks:
+      - type: RECORD_COUNT
+        source: sap.vendor_master
+        target: s3.silver.vendor_master
+        tolerance_pct: 0
+
+  purchase_orders_daily:
+    checks:
+      - type: RECORD_COUNT
+        source: sap.purchase_orders
+        target: s3.silver.purchase_orders
+        tolerance_pct: 0
+      - type: CONTROL_TOTAL
+        column: po_total
+        source: sap.purchase_orders
+        target: s3.silver.purchase_orders
+        tolerance_pct: 0.01
+
+  inventory_daily:
+    checks:
+      - type: AGGREGATE
+        column: quantity_on_hand
+        agg: SUM
+        source: sap.inventory
+        target: redshift.fact_inventory
+        tolerance_pct: 0.5
+
+  store_master_daily:
+    checks:
+      - type: RECORD_COUNT
+        source: sap.store_master
+        target: redshift.dim_store
+        tolerance_pct: 0
+
+  promotions_feed_daily:
+    checks:
+      - type: RECORD_COUNT
+        source: api.promotions_feed
+        target: s3.silver.promotions_feed
+        tolerance_pct: 1
+
+  marketplace_products_daily:
+    checks:
+      - type: RECORD_COUNT
+        source: api.marketplace_products
+        target: s3.silver.marketplace_products
+        tolerance_pct: 1
+
+  supplier_catalog_daily:
+    checks:
+      - type: RECORD_COUNT
+        source: file.supplier_catalog
+        target: s3.silver.supplier_catalog
+        tolerance_pct: 0
+
+  pos_events_hourly:
+    checks:
+      - type: RECORD_COUNT
+        source: kinesis.pos_sales_events
+        target: s3.raw.pos_events
+        tolerance_pct: 0.1
+
+  ecommerce_events_hourly:
+    checks:
+      - type: RECORD_COUNT
+        source: kinesis.ecommerce_events
+        target: s3.raw.ecommerce_events
+        tolerance_pct: 0.1
+
+  historical_sales_backfill:
+    checks:
+      - type: RECORD_COUNT
+        source: legacy_archive.historical_sales
+        target: redshift.fact_sales_historical
+        tolerance_pct: 0
+      - type: CONTROL_TOTAL
+        column: amount
+        source: legacy_archive.historical_sales
+        target: redshift.fact_sales_historical
+        tolerance_pct: 0.01

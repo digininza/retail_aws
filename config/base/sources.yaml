@@ -1,0 +1,249 @@
+# Metadata-driven source/pipeline registry (Section 6).
+# The framework (src/common/config_loader.py) reads this to determine source,
+# target, load type, watermark, primary key, processing engine, retry, and
+# DQ/reconciliation profile — no table-specific logic is hardcoded in pipeline code.
+
+pipelines:
+
+  - pipeline_name: sqlserver_orders_incremental
+    source_system: SQLSERVER
+    source_table: orders
+    connection_secret: SQLSERVER_SECRET_ARN
+    target_path: bronze/orders/
+    load_type: INCREMENTAL
+    watermark_column: modified_date
+    primary_key: order_id
+    active: true
+    processing_engine: GLUE
+    partition_columns: [order_date]
+    retry_count: 3
+    dq_profile: orders_standard
+    reconciliation_profile: orders_daily
+
+  - pipeline_name: sqlserver_order_items_incremental
+    source_system: SQLSERVER
+    source_table: order_items
+    connection_secret: SQLSERVER_SECRET_ARN
+    target_path: bronze/order_items/
+    load_type: INCREMENTAL
+    watermark_column: modified_date
+    primary_key: order_item_id
+    active: true
+    processing_engine: GLUE
+    partition_columns: [order_date]
+    retry_count: 3
+    dq_profile: order_items_standard
+    reconciliation_profile: order_items_daily
+
+  - pipeline_name: sqlserver_customers_cdc
+    source_system: SQLSERVER
+    source_table: customers
+    connection_secret: SQLSERVER_SECRET_ARN
+    target_path: bronze/customers_cdc/
+    load_type: CDC
+    watermark_column: change_timestamp
+    primary_key: customer_id
+    active: true
+    processing_engine: GLUE
+    partition_columns: [change_date]
+    retry_count: 3
+    dq_profile: customers_standard
+    reconciliation_profile: customers_daily
+    downstream: scd2_dim_customer
+
+  - pipeline_name: sqlserver_stores_full
+    source_system: SQLSERVER
+    source_table: stores
+    connection_secret: SQLSERVER_SECRET_ARN
+    target_path: bronze/stores/
+    load_type: FULL
+    watermark_column: null
+    primary_key: store_id
+    active: true
+    processing_engine: GLUE
+    partition_columns: []
+    retry_count: 3
+    dq_profile: stores_standard
+    reconciliation_profile: stores_daily
+
+  - pipeline_name: sqlserver_promotions_incremental
+    source_system: SQLSERVER
+    source_table: promotions
+    connection_secret: SQLSERVER_SECRET_ARN
+    target_path: bronze/promotions/
+    load_type: INCREMENTAL
+    watermark_column: modified_date
+    primary_key: promotion_id
+    active: true
+    processing_engine: GLUE
+    partition_columns: []
+    retry_count: 3
+    dq_profile: promotions_standard
+    reconciliation_profile: promotions_daily
+
+  - pipeline_name: sap_product_master_incremental
+    source_system: SAP
+    source_table: product_master
+    connection_secret: SAP_SECRET_ARN
+    target_path: bronze/product_master/
+    load_type: INCREMENTAL
+    watermark_column: last_changed_on
+    primary_key: material_number
+    active: true
+    processing_engine: GLUE
+    partition_columns: []
+    retry_count: 5
+    dq_profile: product_master_standard
+    reconciliation_profile: product_master_daily
+
+  - pipeline_name: sap_vendor_master_incremental
+    source_system: SAP
+    source_table: vendor_master
+    connection_secret: SAP_SECRET_ARN
+    target_path: bronze/vendor_master/
+    load_type: INCREMENTAL
+    watermark_column: last_changed_on
+    primary_key: vendor_number
+    active: true
+    processing_engine: GLUE
+    partition_columns: []
+    retry_count: 5
+    dq_profile: vendor_master_standard
+    reconciliation_profile: vendor_master_daily
+
+  - pipeline_name: sap_purchase_orders_incremental
+    source_system: SAP
+    source_table: purchase_orders
+    connection_secret: SAP_SECRET_ARN
+    target_path: bronze/purchase_orders/
+    load_type: INCREMENTAL
+    watermark_column: last_changed_on
+    primary_key: po_number
+    active: true
+    processing_engine: GLUE
+    partition_columns: [po_date]
+    retry_count: 5
+    dq_profile: purchase_orders_standard
+    reconciliation_profile: purchase_orders_daily
+
+  - pipeline_name: sap_inventory_incremental
+    source_system: SAP
+    source_table: inventory
+    connection_secret: SAP_SECRET_ARN
+    target_path: bronze/inventory/
+    load_type: INCREMENTAL
+    watermark_column: last_changed_on
+    primary_key: [store_id, sku]
+    active: true
+    processing_engine: EMR
+    partition_columns: [snapshot_date]
+    retry_count: 5
+    dq_profile: inventory_standard
+    reconciliation_profile: inventory_daily
+
+  - pipeline_name: sap_store_master_full
+    source_system: SAP
+    source_table: store_master
+    connection_secret: SAP_SECRET_ARN
+    target_path: bronze/store_master/
+    load_type: FULL
+    watermark_column: null
+    primary_key: store_id
+    active: true
+    processing_engine: GLUE
+    partition_columns: []
+    retry_count: 5
+    dq_profile: store_master_standard
+    reconciliation_profile: store_master_daily
+
+  - pipeline_name: api_promotions_feed
+    source_system: REST_API
+    source_table: promotions_feed
+    connection_secret: REST_API_SECRET_ARN
+    endpoint: /v1/promotions
+    target_path: bronze/promotions_feed/
+    load_type: INCREMENTAL
+    watermark_column: updated_at
+    primary_key: promo_code
+    active: true
+    processing_engine: GLUE
+    pagination: cursor
+    rate_limit_per_minute: 60
+    retry_count: 5
+    dq_profile: promotions_feed_standard
+    reconciliation_profile: promotions_feed_daily
+
+  - pipeline_name: api_marketplace_feed
+    source_system: REST_API
+    source_table: marketplace_products
+    connection_secret: REST_API_SECRET_ARN
+    endpoint: /v1/marketplace/products
+    target_path: bronze/marketplace_products/
+    load_type: INCREMENTAL
+    watermark_column: updated_at
+    primary_key: marketplace_sku
+    active: true
+    processing_engine: GLUE
+    pagination: page
+    rate_limit_per_minute: 30
+    retry_count: 5
+    dq_profile: marketplace_products_standard
+    reconciliation_profile: marketplace_products_daily
+
+  - pipeline_name: supplier_catalog_files
+    source_system: SUPPLIER_FILE
+    source_table: supplier_catalog
+    target_path: bronze/supplier_catalog/
+    load_type: FULL
+    watermark_column: file_date
+    primary_key: [supplier_id, supplier_sku]
+    active: true
+    processing_engine: GLUE
+    file_format: csv
+    retry_count: 3
+    dq_profile: supplier_catalog_standard
+    reconciliation_profile: supplier_catalog_daily
+
+  - pipeline_name: pos_sales_events_stream
+    source_system: POS
+    source_table: pos_sales_events
+    target_path: bronze/pos_events/
+    load_type: STREAMING
+    watermark_column: event_timestamp
+    primary_key: event_id
+    active: true
+    processing_engine: LAMBDA
+    stream_name: retail-pos-events
+    partition_key: store_id
+    retry_count: 3
+    dq_profile: pos_events_standard
+    reconciliation_profile: pos_events_hourly
+
+  - pipeline_name: ecommerce_events_stream
+    source_system: ECOMMERCE
+    source_table: ecommerce_events
+    target_path: bronze/ecommerce_events/
+    load_type: STREAMING
+    watermark_column: event_timestamp
+    primary_key: event_id
+    active: true
+    processing_engine: LAMBDA
+    stream_name: retail-ecommerce-events
+    partition_key: customer_id
+    retry_count: 3
+    dq_profile: ecommerce_events_standard
+    reconciliation_profile: ecommerce_events_hourly
+
+  - pipeline_name: historical_sales_backfill
+    source_system: LEGACY_ARCHIVE
+    source_table: historical_sales
+    target_path: bronze/historical_sales/
+    load_type: FULL
+    watermark_column: null
+    primary_key: [order_id, order_item_id]
+    active: true
+    processing_engine: EMR
+    partition_columns: [order_year, order_month]
+    retry_count: 2
+    dq_profile: historical_sales_standard
+    reconciliation_profile: historical_sales_backfill

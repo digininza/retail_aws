@@ -1,0 +1,12 @@
+# QA deployment parameters. Same shape as dev.yaml — CI/CD substitutes the
+# per-environment values from this file rather than branching logic in the
+# pipeline definition itself (Section 25/26: environment config vs. pipeline behavior).
+environment: qa
+account_id: "111111111111"
+region: us-east-1
+approval_required: false
+smoke_test_required: true
+cloudformation_stack_name: retail-qa-data-lake
+glue_job_config: infrastructure/glue/glue-job-definitions.json
+mwaa_dags_bucket: retail-qa-mwaa-dags
+rollback_on_failure: true

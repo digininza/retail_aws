@@ -1,0 +1,6 @@
+store_id,store_name,region,city,format,modified_date
+STORE-01,RetailCo Delhi Central,NORTH,Delhi,FLAGSHIP,2026-07-01T00:00:00
+STORE-02,RetailCo Mumbai Bandra,WEST,Mumbai,STANDARD,2026-07-01T00:00:00
+STORE-03,RetailCo Bengaluru Koramangala,SOUTH,Bengaluru,STANDARD,2026-07-01T00:00:00
+STORE-04,RetailCo Hyderabad Jubilee,SOUTH,Hyderabad,COMPACT,2026-07-01T00:00:00
+STORE-05,RetailCo Pune Camp,WEST,Pune,STANDARD,2026-07-01T00:00:00

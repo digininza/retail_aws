@@ -1,0 +1,55 @@
+{
+  "_comment": "EXAMPLE POLICY — placeholder account ID/bucket names. Substituted per-environment by CI/CD. Do not deploy verbatim.",
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ReadWriteDataLakeZones",
+      "Effect": "Allow",
+      "Action": ["s3:GetObject", "s3:PutObject", "s3:DeleteObject"],
+      "Resource": [
+        "arn:aws:s3:::retail-data-{environment}/raw/*",
+        "arn:aws:s3:::retail-data-{environment}/bronze/*",
+        "arn:aws:s3:::retail-data-{environment}/silver/*",
+        "arn:aws:s3:::retail-data-{environment}/gold/*",
+        "arn:aws:s3:::retail-data-{environment}/quarantine/*"
+      ]
+    },
+    {
+      "Sid": "ListDataLakeBucket",
+      "Effect": "Allow",
+      "Action": ["s3:ListBucket"],
+      "Resource": ["arn:aws:s3:::retail-data-{environment}"]
+    },
+    {
+      "Sid": "GlueDataCatalog",
+      "Effect": "Allow",
+      "Action": [
+        "glue:GetTable", "glue:GetTables", "glue:CreateTable", "glue:UpdateTable",
+        "glue:BatchCreatePartition", "glue:GetPartitions", "glue:GetDatabase"
+      ],
+      "Resource": [
+        "arn:aws:glue:us-east-1:000000000000:catalog",
+        "arn:aws:glue:us-east-1:000000000000:database/retail_{environment}_catalog",
+        "arn:aws:glue:us-east-1:000000000000:table/retail_{environment}_catalog/*"
+      ]
+    },
+    {
+      "Sid": "ReadSourceCredentials",
+      "Effect": "Allow",
+      "Action": ["secretsmanager:GetSecretValue"],
+      "Resource": ["arn:aws:secretsmanager:us-east-1:000000000000:secret:retail/{environment}/*"]
+    },
+    {
+      "Sid": "DecryptDataLakeKms",
+      "Effect": "Allow",
+      "Action": ["kms:Decrypt", "kms:GenerateDataKey"],
+      "Resource": ["arn:aws:kms:us-east-1:000000000000:key/retail-{environment}-data-key"]
+    },
+    {
+      "Sid": "WriteLogsAndMetrics",
+      "Effect": "Allow",
+      "Action": ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents", "cloudwatch:PutMetricData"],
+      "Resource": "*"
+    }
+  ]
+}

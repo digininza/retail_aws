@@ -1,0 +1,99 @@
+# Illustrative AWS CodePipeline definition (Section 26). This YAML describes
+# pipeline STRUCTURE; AWS CodePipeline is the service that EXECUTES each
+# stage by invoking CodeBuild/CloudFormation/Lambda actions — the YAML does
+# not run anything by itself.
+#
+# Stage sequence (Section 26): Source -> Validate -> Unit Test -> Package ->
+# Deploy Dev -> Smoke Test -> Deploy QA -> Approval -> Deploy Prod ->
+# Post-deployment validation.
+
+pipeline:
+  name: retail-aws-data-platform-pipeline
+  artifact_store:
+    type: S3
+    bucket: retail-cicd-artifacts
+
+  stages:
+    - name: Source
+      actions:
+        - action: CodeStarSourceConnection
+          provider: GitHub
+          output_artifact: SourceOutput
+          branch: main
+
+    - name: BuildAndTest
+      actions:
+        - action: CodeBuild
+          project: retail-platform-build
+          input_artifact: SourceOutput
+          output_artifact: BuildOutput
+          buildspec: cicd/buildspec.yml
+          # Runs Validate + Unit Test + Package (buildspec.yml phases) as one
+          # CodeBuild project — split into separate CodeBuild projects if
+          # per-phase visibility in the pipeline console becomes valuable.
+
+    - name: DeployDev
+      actions:
+        - action: CloudFormationDeploy
+          template: infrastructure/cloudformation/s3-data-lake.yaml
+          stack_name: retail-dev-data-lake
+          parameter_overrides:
+            Environment: dev
+        - action: DeployGlueJobs
+          config: infrastructure/glue/glue-job-definitions.json
+          environment: dev
+        - action: DeployLambdaFunctions
+          environment: dev
+        - action: SyncAirflowDags
+          destination_bucket: retail-dev-mwaa-dags
+
+    - name: SmokeTestDev
+      actions:
+        - action: CodeBuild
+          project: retail-platform-smoke-test
+          environment_variables:
+            TARGET_ENV: dev
+          # Runs `make demo-incremental` equivalent against Dev infra and
+          # checks the control table shows a SUCCESS run before proceeding.
+
+    - name: DeployQA
+      actions:
+        - action: CloudFormationDeploy
+          stack_name: retail-qa-data-lake
+          parameter_overrides:
+            Environment: qa
+        - action: DeployGlueJobs
+          environment: qa
+        - action: DeployLambdaFunctions
+          environment: qa
+        - action: SyncAirflowDags
+          destination_bucket: retail-qa-mwaa-dags
+
+    - name: ManualApprovalForProd
+      actions:
+        - action: ManualApproval
+          notification_topic: arn:aws:sns:us-east-1:000000000000:retail-qa-pipeline-alerts
+          custom_message: "Approve promotion of retail-aws-data-platform to PROD"
+
+    - name: DeployProd
+      actions:
+        - action: CloudFormationDeploy
+          stack_name: retail-prod-data-lake
+          parameter_overrides:
+            Environment: prod
+        - action: DeployGlueJobs
+          environment: prod
+        - action: DeployLambdaFunctions
+          environment: prod
+        - action: SyncAirflowDags
+          destination_bucket: retail-prod-mwaa-dags
+
+    - name: PostDeploymentValidationProd
+      actions:
+        - action: CodeBuild
+          project: retail-platform-post-deploy-validation
+          environment_variables:
+            TARGET_ENV: prod
+          # Confirms Glue job definitions, Lambda versions, and Airflow DAG
+          # parse-ability in Prod; does NOT run a full data pipeline against
+          # Prod data as part of deployment validation.

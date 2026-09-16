@@ -1,0 +1,7 @@
+{"event_id": "ECOM-EVT-0001", "event_type": "PRODUCT_VIEWED", "event_timestamp": "2026-08-15T10:00:00+00:00", "customer_id": "CUST-0002", "sku": "SKU-101", "session_id": "SESS-A1"}
+{"event_id": "ECOM-EVT-0002", "event_type": "CART_ACTIVITY", "event_timestamp": "2026-08-15T10:02:15+00:00", "customer_id": "CUST-0002", "sku": "SKU-101", "session_id": "SESS-A1"}
+{"event_id": "ECOM-EVT-0003", "event_type": "ORDER_CREATED", "event_timestamp": "2026-08-15T10:05:00+00:00", "customer_id": "CUST-0002", "order_id": "ORD-1013", "session_id": "SESS-A1"}
+{"event_id": "ECOM-EVT-0004", "event_type": "PAYMENT_COMPLETED", "event_timestamp": "2026-08-15T10:06:30+00:00", "customer_id": "CUST-0002", "order_id": "ORD-1013", "session_id": "SESS-A1"}
+{"event_id": "ECOM-EVT-0005", "event_type": "PRODUCT_VIEWED", "event_timestamp": "2026-08-15T10:10:00+00:00", "customer_id": "CUST-0005", "sku": "SKU-104", "session_id": "SESS-B2"}
+{"event_id": "ECOM-EVT-0006", "event_type": "ORDER_UPDATED", "event_timestamp": "2026-08-15T10:15:00+00:00", "customer_id": "CUST-0005", "order_id": "ORD-1005", "session_id": "SESS-B2"}
+{"event_id": "ECOM-EVT-0007", "event_type": "INVALID_TYPE", "event_timestamp": "2026-08-15T10:20:00+00:00", "customer_id": "CUST-0009", "sku": "SKU-109", "session_id": "SESS-C3"}

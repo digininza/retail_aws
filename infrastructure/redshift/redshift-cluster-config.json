@@ -1,0 +1,21 @@
+{
+  "_comment": "EXAMPLE Redshift cluster configuration. Prod uses a larger, multi-node cluster; Dev/QA use smaller single-node clusters — see config/{env}/environment.yaml for the pointers this file's placeholders resolve against.",
+  "ClusterIdentifier": "{{ redshift.cluster_identifier }}",
+  "DBName": "{{ redshift.database }}",
+  "NodeType": "ra3.xlplus",
+  "NumberOfNodes": "{{ 1 if environment != 'prod' else 3 }}",
+  "ClusterType": "{{ 'single-node' if environment != 'prod' else 'multi-node' }}",
+  "IamRoles": ["arn:aws:iam::000000000000:role/retail-{environment}-redshift-load-role"],
+  "Encrypted": true,
+  "KmsKeyId": "alias/retail-{environment}-data-key",
+  "VpcSecurityGroupIds": ["sg-EXAMPLE"],
+  "PubliclyAccessible": false,
+  "AutomatedSnapshotRetentionPeriod": 7,
+  "WorkloadManagement": {
+    "_comment": "Separate WLM queues isolate ETL load spikes from BI query concurrency (Section 18 workload separation).",
+    "Queues": [
+      {"Name": "{{ redshift.workload_management_queue }}", "MemoryPercent": 60, "Concurrency": 5},
+      {"Name": "bi_queries", "MemoryPercent": 40, "Concurrency": 10}
+    ]
+  }
+}

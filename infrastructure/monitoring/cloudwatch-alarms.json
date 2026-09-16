@@ -1,0 +1,47 @@
+{
+  "_comment": "EXAMPLE CloudWatch alarms (Section 20), all publishing to the SNS alert topic. Thresholds are illustrative starting points, tuned per-pipeline after observing real volumes.",
+  "alarms": [
+    {
+      "AlarmName": "retail-{environment}-glue-job-failures",
+      "Namespace": "Glue", "MetricName": "glue.driver.aggregate.numFailedTasks",
+      "Statistic": "Sum", "Period": 300, "EvaluationPeriods": 1, "Threshold": 0,
+      "ComparisonOperator": "GreaterThanThreshold",
+      "AlarmActions": ["arn:aws:sns:us-east-1:000000000000:retail-{environment}-pipeline-alerts"]
+    },
+    {
+      "AlarmName": "retail-{environment}-pipeline-dq-critical-failures",
+      "Namespace": "RetailPlatform", "MetricName": "DQFailures",
+      "Statistic": "Sum", "Period": 900, "EvaluationPeriods": 1, "Threshold": 0,
+      "ComparisonOperator": "GreaterThanThreshold",
+      "AlarmActions": ["arn:aws:sns:us-east-1:000000000000:retail-{environment}-pipeline-alerts"]
+    },
+    {
+      "AlarmName": "retail-{environment}-data-freshness-breach",
+      "Namespace": "RetailPlatform", "MetricName": "DataFreshnessHours",
+      "Statistic": "Maximum", "Period": 3600, "EvaluationPeriods": 1, "Threshold": 26,
+      "ComparisonOperator": "GreaterThanThreshold",
+      "AlarmActions": ["arn:aws:sns:us-east-1:000000000000:retail-{environment}-pipeline-alerts"]
+    },
+    {
+      "AlarmName": "retail-{environment}-reconciliation-failures",
+      "Namespace": "RetailPlatform", "MetricName": "ReconciliationFailures",
+      "Statistic": "Sum", "Period": 900, "EvaluationPeriods": 1, "Threshold": 0,
+      "ComparisonOperator": "GreaterThanThreshold",
+      "AlarmActions": ["arn:aws:sns:us-east-1:000000000000:retail-{environment}-pipeline-alerts"]
+    },
+    {
+      "AlarmName": "retail-{environment}-lambda-errors",
+      "Namespace": "AWS/Lambda", "MetricName": "Errors",
+      "Statistic": "Sum", "Period": 300, "EvaluationPeriods": 1, "Threshold": 3,
+      "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+      "AlarmActions": ["arn:aws:sns:us-east-1:000000000000:retail-{environment}-pipeline-alerts"]
+    },
+    {
+      "AlarmName": "retail-{environment}-pipeline-duration-sla-breach",
+      "Namespace": "RetailPlatform", "MetricName": "DurationSeconds",
+      "Statistic": "Maximum", "Period": 3600, "EvaluationPeriods": 1, "Threshold": 10800,
+      "ComparisonOperator": "GreaterThanThreshold",
+      "AlarmActions": ["arn:aws:sns:us-east-1:000000000000:retail-{environment}-pipeline-alerts"]
+    }
+  ]
+}

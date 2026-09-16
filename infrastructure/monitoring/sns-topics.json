@@ -1,0 +1,13 @@
+{
+  "_comment": "EXAMPLE SNS topic + subscriptions per environment. Prod fans out to PagerDuty (via HTTPS subscription) in addition to email; Dev/QA email-only.",
+  "topics": [
+    {
+      "TopicName": "retail-{environment}-pipeline-alerts",
+      "KmsMasterKeyId": "alias/retail-{environment}-data-key",
+      "Subscriptions": [
+        {"Protocol": "email", "Endpoint": "data-platform-oncall@retailco.example"},
+        {"Protocol": "https", "Endpoint": "https://events.pagerduty.example/integration/EXAMPLE", "Environments": ["prod"]}
+      ]
+    }
+  ]
+}

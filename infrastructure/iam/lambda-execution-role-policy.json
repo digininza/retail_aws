@@ -1,0 +1,36 @@
+{
+  "_comment": "EXAMPLE POLICY for file_arrival_handler specifically — each Lambda function gets its own scoped role, not one shared Lambda role (see infrastructure/iam/README.md principle 2).",
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ReadRawPrefixOnly",
+      "Effect": "Allow",
+      "Action": ["s3:GetObject", "s3:HeadObject"],
+      "Resource": ["arn:aws:s3:::retail-data-{environment}/raw/*"]
+    },
+    {
+      "Sid": "WriteQuarantinePrefixOnly",
+      "Effect": "Allow",
+      "Action": ["s3:PutObject"],
+      "Resource": ["arn:aws:s3:::retail-data-{environment}/quarantine/*"]
+    },
+    {
+      "Sid": "PublishAlerts",
+      "Effect": "Allow",
+      "Action": ["sns:Publish"],
+      "Resource": ["arn:aws:sns:us-east-1:000000000000:retail-{environment}-pipeline-alerts"]
+    },
+    {
+      "Sid": "InvokePipelineTrigger",
+      "Effect": "Allow",
+      "Action": ["lambda:InvokeFunction"],
+      "Resource": ["arn:aws:lambda:us-east-1:000000000000:function:retail-{environment}-pipeline-trigger"]
+    },
+    {
+      "Sid": "LambdaLogs",
+      "Effect": "Allow",
+      "Action": ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"],
+      "Resource": "*"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "_comment": "EXAMPLE Amazon MWAA environment configuration.",
+  "Name": "{{ airflow.environment_name }}",
+  "AirflowVersion": "2.9.2",
+  "SourceBucketArn": "arn:aws:s3:::retail-{environment}-mwaa-dags",
+  "DagS3Path": "dags",
+  "PluginsS3Path": "plugins.zip",
+  "RequirementsS3Path": "requirements.txt",
+  "ExecutionRoleArn": "arn:aws:iam::000000000000:role/retail-{environment}-mwaa-execution-role",
+  "NetworkConfiguration": {"SecurityGroupIds": ["sg-EXAMPLE"], "SubnetIds": ["subnet-EXAMPLE-A", "subnet-EXAMPLE-B"]},
+  "WebserverAccessMode": "PRIVATE_ONLY",
+  "EnvironmentClass": "{{ 'mw1.small' if environment != 'prod' else 'mw1.medium' }}",
+  "MaxWorkers": "{{ airflow.dag_concurrency }}",
+  "AirflowConfigurationOptions": {
+    "core.default_task_retries": "{{ airflow.default_retries }}",
+    "core.parallelism": "{{ airflow.dag_concurrency }}"
+  },
+  "LoggingConfiguration": {
+    "TaskLogs": {"Enabled": true, "LogLevel": "INFO"},
+    "SchedulerLogs": {"Enabled": true, "LogLevel": "WARNING"}
+  }
+}

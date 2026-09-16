@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "EcommerceEvent",
+  "type": "object",
+  "required": ["event_id", "event_type", "event_timestamp"],
+  "properties": {
+    "event_id": {"type": "string", "description": "Idempotency key for this event"},
+    "event_type": {
+      "type": "string",
+      "enum": ["ORDER_CREATED", "ORDER_UPDATED", "PAYMENT_COMPLETED", "CART_ACTIVITY", "PRODUCT_VIEWED"]
+    },
+    "event_timestamp": {"type": "string", "format": "date-time"},
+    "customer_id": {"type": "string"},
+    "order_id": {"type": "string"},
+    "sku": {"type": "string"},
+    "session_id": {"type": "string"}
+  },
+  "additionalProperties": true
+}

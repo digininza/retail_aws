@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "POSSalesEvent",
+  "type": "object",
+  "required": ["event_id", "store_id", "sku", "quantity", "amount", "event_timestamp"],
+  "properties": {
+    "event_id": {"type": "string", "description": "Idempotency key for this event"},
+    "store_id": {"type": "string"},
+    "sku": {"type": "string"},
+    "quantity": {"type": "number", "exclusiveMinimum": 0},
+    "amount": {"type": "number", "minimum": 0},
+    "event_timestamp": {"type": "string", "format": "date-time"},
+    "cashier_id": {"type": "string"},
+    "payment_method": {"type": "string", "enum": ["CARD", "CASH", "UPI", "WALLET"]}
+  },
+  "additionalProperties": true
+}

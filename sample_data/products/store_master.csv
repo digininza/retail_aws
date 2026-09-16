@@ -1,0 +1,6 @@
+store_id,store_name,region
+STORE-01,RetailCo Delhi Central,NORTH
+STORE-02,RetailCo Mumbai Bandra,WEST
+STORE-03,RetailCo Bengaluru Koramangala,SOUTH
+STORE-04,RetailCo Hyderabad Jubilee,SOUTH
+STORE-05,RetailCo Pune Camp,WEST

@@ -1,0 +1,25 @@
+{
+  "_comment": "EXAMPLE EMR cluster config, launched per-run by Airflow (EmrCreateJobFlowOperator) and terminated on completion — ephemeral, not a standing cluster (Section 34 cost optimization).",
+  "Name": "retail-{environment}-historical-sales-cluster",
+  "ReleaseLabel": "emr-7.1.0",
+  "Applications": [{"Name": "Spark"}, {"Name": "Hadoop"}],
+  "Instances": {
+    "InstanceGroups": [
+      {"Name": "Master", "InstanceRole": "MASTER", "InstanceType": "{{ emr.instance_type_master }}", "InstanceCount": 1},
+      {"Name": "Core", "InstanceRole": "CORE", "InstanceType": "{{ emr.instance_type_core }}", "InstanceCount": "{{ emr.core_instance_count }}"}
+    ],
+    "Ec2SubnetId": "subnet-EXAMPLE",
+    "KeepJobFlowAliveWhenNoSteps": false,
+    "TerminationProtected": false
+  },
+  "BootstrapActions": [
+    {"Name": "install-dependencies", "ScriptBootstrapAction": {"Path": "s3://retail-{environment}-deployment-artifacts/emr/bootstrap/bootstrap.sh"}}
+  ],
+  "JobFlowRole": "retail-{environment}-emr-instance-profile",
+  "ServiceRole": "retail-{environment}-emr-execution-role",
+  "LogUri": "s3://retail-{environment}-emr-logs/",
+  "Configurations": [
+    {"Classification": "spark-defaults", "Properties": {"spark.sql.adaptive.enabled": "true", "spark.sql.adaptive.coalescePartitions.enabled": "true"}}
+  ],
+  "Tags": [{"Key": "Project", "Value": "retail-aws-data-platform"}, {"Key": "Environment", "Value": "{{ environment }}"}]
+}

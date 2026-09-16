@@ -1,0 +1,41 @@
+{
+  "_comment": "EXAMPLE POLICY — CodeBuild/CodePipeline deployment role. Prod-targeting actions are additionally gated by a manual approval pipeline stage (see cicd/pipeline.yaml), not by IAM alone.",
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DeployGlueJobs",
+      "Effect": "Allow",
+      "Action": ["glue:CreateJob", "glue:UpdateJob", "glue:GetJob"],
+      "Resource": ["arn:aws:glue:us-east-1:000000000000:job/retail-*"]
+    },
+    {
+      "Sid": "SyncArtifactsToS3",
+      "Effect": "Allow",
+      "Action": ["s3:PutObject", "s3:GetObject", "s3:ListBucket"],
+      "Resource": [
+        "arn:aws:s3:::retail-{environment}-deployment-artifacts",
+        "arn:aws:s3:::retail-{environment}-deployment-artifacts/*",
+        "arn:aws:s3:::retail-{environment}-mwaa-dags/*"
+      ]
+    },
+    {
+      "Sid": "UpdateLambdaCode",
+      "Effect": "Allow",
+      "Action": ["lambda:UpdateFunctionCode", "lambda:PublishVersion"],
+      "Resource": ["arn:aws:lambda:us-east-1:000000000000:function:retail-{environment}-*"]
+    },
+    {
+      "Sid": "CloudFormationDeploy",
+      "Effect": "Allow",
+      "Action": ["cloudformation:CreateStack", "cloudformation:UpdateStack", "cloudformation:DescribeStacks"],
+      "Resource": ["arn:aws:cloudformation:us-east-1:000000000000:stack/retail-{environment}-*/*"]
+    },
+    {
+      "Sid": "AssumeEnvironmentSpecificDeployRole",
+      "Effect": "Allow",
+      "Action": ["sts:AssumeRole"],
+      "Resource": ["arn:aws:iam::*:role/retail-{environment}-deploy-target-role"],
+      "Condition": {"StringEquals": {"sts:ExternalId": "retail-cicd"}}
+    }
+  ]
+}

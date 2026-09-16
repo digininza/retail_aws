@@ -1,0 +1,7 @@
+{"event_id": "POS-EVT-0001", "store_id": "STORE-01", "sku": "SKU-100", "quantity": 1, "amount": 149.99, "event_timestamp": "2026-08-15T09:00:00+00:00", "cashier_id": "EMP-501", "payment_method": "CARD"}
+{"event_id": "POS-EVT-0002", "store_id": "STORE-02", "sku": "SKU-103", "quantity": 2, "amount": 179.98, "event_timestamp": "2026-08-15T09:02:30+00:00", "cashier_id": "EMP-402", "payment_method": "CASH"}
+{"event_id": "POS-EVT-0003", "store_id": "STORE-01", "sku": "SKU-106", "quantity": 3, "amount": 45.75, "event_timestamp": "2026-08-15T09:05:10+00:00", "cashier_id": "EMP-501", "payment_method": "CARD"}
+{"event_id": "POS-EVT-0004", "store_id": "STORE-03", "sku": "SKU-105", "quantity": 1, "amount": 999.99, "event_timestamp": "2026-08-15T09:07:45+00:00", "cashier_id": "EMP-310", "payment_method": "CARD"}
+{"event_id": "POS-EVT-0002", "store_id": "STORE-02", "sku": "SKU-103", "quantity": 2, "amount": 179.98, "event_timestamp": "2026-08-15T09:02:30+00:00", "cashier_id": "EMP-402", "payment_method": "CASH"}
+{"event_id": "POS-EVT-0005", "store_id": "STORE-04", "sku": "SKU-108", "quantity": -1, "amount": 35.00, "event_timestamp": "2026-08-15T09:10:00+00:00", "cashier_id": "EMP-450", "payment_method": "CARD"}
+{"event_id": "POS-EVT-0006", "store_id": "STORE-05", "sku": "SKU-112", "quantity": 1, "amount": 18.00, "event_timestamp": "2026-08-15T09:12:20+00:00", "cashier_id": "EMP-550", "payment_method": "UPI"}

@@ -1,0 +1,57 @@
+environment: prod
+
+s3:
+  bucket: retail-data-prod
+  raw_prefix: raw/
+  bronze_prefix: bronze/
+  silver_prefix: silver/
+  gold_prefix: gold/
+  quarantine_prefix: quarantine/
+  archive_prefix: archive/
+  kms_key_alias: alias/retail-prod-data-key
+
+redshift:
+  cluster_identifier: retail-prod-cluster
+  database: retailprod
+  schema_staging: staging
+  schema_curated: curated
+  workload_management_queue: prod_etl
+
+glue:
+  database: retail_prod_catalog
+  execution_role_arn: arn:aws:iam::222222222222:role/retail-prod-glue-execution-role
+  worker_type: G.2X
+  number_of_workers: 20
+  max_concurrent_runs: 10
+
+emr:
+  execution_role_arn: arn:aws:iam::222222222222:role/retail-prod-emr-execution-role
+  instance_type_master: m5.4xlarge
+  instance_type_core: r5.4xlarge
+  core_instance_count: 10
+  release_label: emr-7.1.0
+  ephemeral: true
+
+airflow:
+  environment_name: retail-prod-mwaa
+  dag_concurrency: 32
+  default_retries: 3
+
+kinesis:
+  pos_stream_name: retail-prod-pos-events
+  ecommerce_stream_name: retail-prod-ecommerce-events
+  shard_count: 12
+
+secrets_manager:
+  prefix: retail/prod/
+
+sns:
+  alert_topic_arn: arn:aws:sns:us-east-1:222222222222:retail-prod-pipeline-alerts
+
+logging:
+  level: WARNING
+
+feature_flags:
+  enable_emr_heavy_pipeline: true
+  enable_streaming_pipeline: true
+  strict_schema_enforcement: true

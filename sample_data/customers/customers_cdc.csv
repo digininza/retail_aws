@@ -1,0 +1,10 @@
+customer_id,name,email,segment,city,operation,change_timestamp
+CUST-0001,Asha Mehta,asha.mehta@example.com,LOYALTY,Delhi,U,2026-08-10T08:00:00
+CUST-0001,Asha Mehta,asha.mehta@example.com,LOYALTY,Gurgaon,U,2026-08-10T09:30:00
+CUST-0001,Asha Mehta,asha.mehta@example.com,LOYALTY,Gurgaon,U,2026-08-10T09:30:00
+CUST-0012,Ritika Bose,ritika.bose@example.com,STANDARD,Kolkata,I,2026-08-10T10:15:00
+CUST-0003,Priya Nair,priya.nair@example.com,PREMIUM,Bengaluru,U,2026-08-10T11:00:00
+CUST-0003,Priya Nair,priya.nair@example.com,LOYALTY,Bengaluru,U,2026-08-10T08:45:00
+CUST-0007,Kavya Reddy,kavya.reddy@example.com,LOYALTY,Hyderabad,D,2026-08-10T12:00:00
+CUST-0013,Farhan Ali,farhan.ali@example.com,STANDARD,Indore,I,2026-08-10T13:00:00
+CUST-0002,Rohan Kapoor,rohan.kapoor@newmail.com,STANDARD,Mumbai,U,2026-08-10T14:00:00

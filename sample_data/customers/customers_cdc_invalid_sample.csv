@@ -1,0 +1,4 @@
+customer_id,name,email,segment,city,operation,change_timestamp
+CUST-0999,,not-an-email,STANDARD,Unknown,X,2026-08-10T15:00:00
+,Missing Key Customer,missingkey@example.com,STANDARD,Delhi,I,2026-08-10T15:05:00
+CUST-0998,No Timestamp Customer,notimestamp@example.com,STANDARD,Delhi,I,

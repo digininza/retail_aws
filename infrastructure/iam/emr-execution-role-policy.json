@@ -1,0 +1,36 @@
+{
+  "_comment": "EXAMPLE POLICY — placeholder values, substituted per-environment by CI/CD.",
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ReadSilverWriteGold",
+      "Effect": "Allow",
+      "Action": ["s3:GetObject"],
+      "Resource": ["arn:aws:s3:::retail-data-{environment}/silver/*"]
+    },
+    {
+      "Sid": "WriteGoldOnly",
+      "Effect": "Allow",
+      "Action": ["s3:PutObject", "s3:DeleteObject"],
+      "Resource": ["arn:aws:s3:::retail-data-{environment}/gold/*"]
+    },
+    {
+      "Sid": "ListDataLakeBucket",
+      "Effect": "Allow",
+      "Action": ["s3:ListBucket"],
+      "Resource": ["arn:aws:s3:::retail-data-{environment}"]
+    },
+    {
+      "Sid": "EmrLogsAndMetrics",
+      "Effect": "Allow",
+      "Action": ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents", "cloudwatch:PutMetricData"],
+      "Resource": "*"
+    },
+    {
+      "Sid": "DecryptDataLakeKms",
+      "Effect": "Allow",
+      "Action": ["kms:Decrypt", "kms:GenerateDataKey"],
+      "Resource": ["arn:aws:kms:us-east-1:000000000000:key/retail-{environment}-data-key"]
+    }
+  ]
+}

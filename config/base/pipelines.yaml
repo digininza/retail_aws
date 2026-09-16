@@ -1,0 +1,67 @@
+# Pipeline-level (as opposed to source-table-level) configuration:
+# processing stage sequencing, engine defaults, and downstream wiring.
+# Individual table metadata lives in sources.yaml; this file configures how
+# stages compose, independent of which table is running through them.
+
+defaults:
+  processing_engine: GLUE
+  file_format: parquet
+  compression: snappy
+  max_file_size_mb: 256
+  retry:
+    max_attempts: 3
+    initial_delay_seconds: 30
+    max_delay_seconds: 300
+    exponential_backoff: true
+    jitter: true
+
+stages:
+  batch_pipeline:
+    - extract
+    - land_to_raw
+    - schema_validation
+    - dq_precheck
+    - bronze_to_silver
+    - dq_postcheck
+    - reconciliation
+    - silver_to_gold
+    - redshift_load
+    - update_control_table
+
+  emr_heavy_pipeline:
+    - validate_input
+    - emr_submit
+    - monitor_emr
+    - dq_postcheck
+    - reconciliation
+    - redshift_load
+    - update_control_table
+
+  streaming_pipeline:
+    - kinesis_consume
+    - schema_validation
+    - land_to_raw
+    - micro_batch_processing
+    - dq_postcheck
+    - redshift_load
+
+engine_routing:
+  # Which engine handles heavy/complex workloads vs standard ETL.
+  # See ADR-002 and docs/hld for the full rationale.
+  heavy_workloads:
+    - historical_sales_backfill
+    - sap_inventory_incremental
+  standard_workloads:
+    - sqlserver_orders_incremental
+    - sqlserver_order_items_incremental
+    - sqlserver_customers_cdc
+    - sap_product_master_incremental
+    - sap_vendor_master_incremental
+    - api_promotions_feed
+    - api_marketplace_feed
+    - supplier_catalog_files
+
+notifications:
+  on_failure_topic: SNS_ALERT_TOPIC_ARN
+  on_critical_dq_failure_topic: SNS_ALERT_TOPIC_ARN
+  on_reconciliation_failure_topic: SNS_ALERT_TOPIC_ARN

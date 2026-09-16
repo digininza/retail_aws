@@ -1,0 +1,26 @@
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+*.egg-info/
+build/
+dist/
+
+.env
+*.env
+!.env.example
+
+# local adapter state (simulated S3 / control DB) - never commit run artifacts
+.local_s3/
+*.sqlite3
+*.db
+logs/
+*.log
+
+.DS_Store
+.idea/
+.vscode/

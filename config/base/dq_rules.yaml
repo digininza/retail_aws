@@ -1,0 +1,126 @@
+# Data Quality rule profiles (Section 11).
+# Referenced by `dq_profile` in sources.yaml. Severities: CRITICAL, ERROR, WARNING, INFO.
+# CRITICAL failures block promotion to Gold/Redshift. See src/data_quality/framework.py.
+
+profiles:
+
+  orders_standard:
+    table: orders
+    rules:
+      order_id:
+        - {type: NOT_NULL, severity: CRITICAL}
+        - {type: UNIQUE, severity: CRITICAL}
+      customer_id:
+        - {type: NOT_NULL, severity: CRITICAL}
+        - {type: REFERENTIAL_INTEGRITY, ref_table: customers, ref_column: customer_id, severity: ERROR}
+      order_date:
+        - {type: NOT_NULL, severity: CRITICAL}
+        - {type: DATA_TYPE, expected: timestamp, severity: ERROR}
+      amount:
+        - {type: NOT_NULL, severity: CRITICAL}
+        - {type: RANGE, min: 0, max: 100000, severity: ERROR}
+      status:
+        - {type: REGEX, pattern: "^(PLACED|SHIPPED|DELIVERED|CANCELLED|RETURNED)$", severity: WARNING}
+      __table__:
+        - {type: RECORD_COUNT, min: 1, severity: WARNING}
+        - {type: FRESHNESS, max_age_hours: 26, severity: WARNING}
+        - {type: SCHEMA_MATCH, schema_ref: orders, severity: CRITICAL}
+
+  order_items_standard:
+    table: order_items
+    rules:
+      order_item_id: [{type: NOT_NULL, severity: CRITICAL}, {type: UNIQUE, severity: CRITICAL}]
+      order_id: [{type: NOT_NULL, severity: CRITICAL}, {type: REFERENTIAL_INTEGRITY, ref_table: orders, ref_column: order_id, severity: ERROR}]
+      quantity: [{type: NOT_NULL, severity: CRITICAL}, {type: RANGE, min: 1, max: 10000, severity: ERROR}]
+      unit_price: [{type: NOT_NULL, severity: CRITICAL}, {type: RANGE, min: 0, max: 50000, severity: ERROR}]
+
+  customers_standard:
+    table: customers
+    rules:
+      customer_id: [{type: NOT_NULL, severity: CRITICAL}, {type: UNIQUE, severity: CRITICAL}]
+      email: [{type: REGEX, pattern: "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$", severity: WARNING}]
+      operation: [{type: REGEX, pattern: "^(I|U|D)$", severity: CRITICAL}]
+      change_timestamp: [{type: NOT_NULL, severity: CRITICAL}]
+
+  stores_standard:
+    table: stores
+    rules:
+      store_id: [{type: NOT_NULL, severity: CRITICAL}, {type: UNIQUE, severity: CRITICAL}]
+      region: [{type: NOT_NULL, severity: WARNING}]
+
+  promotions_standard:
+    table: promotions
+    rules:
+      promotion_id: [{type: NOT_NULL, severity: CRITICAL}, {type: UNIQUE, severity: CRITICAL}]
+      discount_pct: [{type: RANGE, min: 0, max: 100, severity: ERROR}]
+
+  product_master_standard:
+    table: product_master
+    rules:
+      material_number: [{type: NOT_NULL, severity: CRITICAL}, {type: UNIQUE, severity: CRITICAL}]
+      product_name: [{type: NOT_NULL, severity: ERROR}]
+      unit_of_measure: [{type: NOT_NULL, severity: WARNING}]
+
+  vendor_master_standard:
+    table: vendor_master
+    rules:
+      vendor_number: [{type: NOT_NULL, severity: CRITICAL}, {type: UNIQUE, severity: CRITICAL}]
+
+  purchase_orders_standard:
+    table: purchase_orders
+    rules:
+      po_number: [{type: NOT_NULL, severity: CRITICAL}, {type: UNIQUE, severity: CRITICAL}]
+      vendor_number: [{type: NOT_NULL, severity: CRITICAL}, {type: REFERENTIAL_INTEGRITY, ref_table: vendor_master, ref_column: vendor_number, severity: ERROR}]
+      po_total: [{type: RANGE, min: 0, max: 10000000, severity: ERROR}]
+
+  inventory_standard:
+    table: inventory
+    rules:
+      store_id: [{type: NOT_NULL, severity: CRITICAL}]
+      sku: [{type: NOT_NULL, severity: CRITICAL}]
+      quantity_on_hand: [{type: NOT_NULL, severity: CRITICAL}, {type: RANGE, min: 0, max: 1000000, severity: ERROR}]
+
+  store_master_standard:
+    table: store_master
+    rules:
+      store_id: [{type: NOT_NULL, severity: CRITICAL}, {type: UNIQUE, severity: CRITICAL}]
+
+  promotions_feed_standard:
+    table: promotions_feed
+    rules:
+      promo_code: [{type: NOT_NULL, severity: CRITICAL}, {type: UNIQUE, severity: CRITICAL}]
+      discount_pct: [{type: RANGE, min: 0, max: 100, severity: ERROR}]
+
+  marketplace_products_standard:
+    table: marketplace_products
+    rules:
+      marketplace_sku: [{type: NOT_NULL, severity: CRITICAL}, {type: UNIQUE, severity: CRITICAL}]
+
+  supplier_catalog_standard:
+    table: supplier_catalog
+    rules:
+      supplier_id: [{type: NOT_NULL, severity: CRITICAL}]
+      supplier_sku: [{type: NOT_NULL, severity: CRITICAL}]
+      list_price: [{type: RANGE, min: 0, max: 100000, severity: ERROR}]
+
+  pos_events_standard:
+    table: pos_sales_events
+    rules:
+      event_id: [{type: NOT_NULL, severity: CRITICAL}, {type: UNIQUE, severity: CRITICAL}]
+      store_id: [{type: NOT_NULL, severity: CRITICAL}]
+      amount: [{type: RANGE, min: 0, max: 50000, severity: ERROR}]
+      event_timestamp: [{type: NOT_NULL, severity: CRITICAL}, {type: FRESHNESS, max_age_hours: 1, severity: WARNING}]
+
+  ecommerce_events_standard:
+    table: ecommerce_events
+    rules:
+      event_id: [{type: NOT_NULL, severity: CRITICAL}, {type: UNIQUE, severity: CRITICAL}]
+      event_type: [{type: REGEX, pattern: "^(ORDER_CREATED|ORDER_UPDATED|PAYMENT_COMPLETED|CART_ACTIVITY|PRODUCT_VIEWED)$", severity: ERROR}]
+      customer_id: [{type: NOT_NULL, severity: WARNING}]
+
+  historical_sales_standard:
+    table: historical_sales
+    rules:
+      order_id: [{type: NOT_NULL, severity: CRITICAL}]
+      order_item_id: [{type: NOT_NULL, severity: CRITICAL}]
+      amount: [{type: RANGE, min: 0, max: 100000, severity: ERROR}]

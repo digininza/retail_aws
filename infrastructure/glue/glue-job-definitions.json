@@ -1,0 +1,46 @@
+{
+  "_comment": "EXAMPLE Glue job definitions (as passed to glue:CreateJob), one entry per script under glue/jobs/. Worker type/count come from config/{env}/environment.yaml at deploy time.",
+  "jobs": [
+    {
+      "Name": "ingest_sqlserver",
+      "Role": "arn:aws:iam::000000000000:role/retail-{environment}-glue-execution-role",
+      "Command": {"Name": "glueetl", "ScriptLocation": "s3://retail-{environment}-deployment-artifacts/glue/jobs/ingest_sqlserver.py", "PythonVersion": "3"},
+      "DefaultArguments": {"--job-bookmark-option": "job-bookmark-enable", "--enable-metrics": "true", "--enable-continuous-cloudwatch-log": "true"},
+      "WorkerType": "{{ glue.worker_type }}",
+      "NumberOfWorkers": "{{ glue.number_of_workers }}",
+      "MaxConcurrentRuns": "{{ glue.max_concurrent_runs }}",
+      "Timeout": 60
+    },
+    {
+      "Name": "ingest_sap",
+      "Role": "arn:aws:iam::000000000000:role/retail-{environment}-glue-execution-role",
+      "Command": {"Name": "glueetl", "ScriptLocation": "s3://retail-{environment}-deployment-artifacts/glue/jobs/ingest_sap.py", "PythonVersion": "3"},
+      "WorkerType": "{{ glue.worker_type }}",
+      "NumberOfWorkers": "{{ glue.number_of_workers }}",
+      "Timeout": 90
+    },
+    {
+      "Name": "ingest_api",
+      "Role": "arn:aws:iam::000000000000:role/retail-{environment}-glue-execution-role",
+      "Command": {"Name": "pythonshell", "ScriptLocation": "s3://retail-{environment}-deployment-artifacts/glue/jobs/ingest_api.py", "PythonVersion": "3.9"},
+      "MaxCapacity": 1,
+      "Timeout": 30
+    },
+    {
+      "Name": "bronze_to_silver",
+      "Role": "arn:aws:iam::000000000000:role/retail-{environment}-glue-execution-role",
+      "Command": {"Name": "glueetl", "ScriptLocation": "s3://retail-{environment}-deployment-artifacts/glue/jobs/bronze_to_silver.py", "PythonVersion": "3"},
+      "WorkerType": "{{ glue.worker_type }}",
+      "NumberOfWorkers": "{{ glue.number_of_workers }}",
+      "Timeout": 60
+    },
+    {
+      "Name": "silver_to_gold",
+      "Role": "arn:aws:iam::000000000000:role/retail-{environment}-glue-execution-role",
+      "Command": {"Name": "glueetl", "ScriptLocation": "s3://retail-{environment}-deployment-artifacts/glue/jobs/silver_to_gold.py", "PythonVersion": "3"},
+      "WorkerType": "{{ glue.worker_type }}",
+      "NumberOfWorkers": "{{ glue.number_of_workers }}",
+      "Timeout": 60
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+# AWS CodeBuild buildspec (Section 26). This file defines BUILD behavior;
+# AWS CodeBuild is the tool that EXECUTES it — the YAML itself does not
+# deploy anything on its own.
+version: 0.2
+
+env:
+  variables:
+    PYTHON_VERSION: "3.10"
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.10
+    commands:
+      - pip install -r requirements.txt
+      - pip install black isort mypy
+
+  pre_build:
+    commands:
+      # Validate: config YAML parses, no syntax errors in job scripts.
+      - python -c "from src.common.config_loader import ConfigLoader; [ConfigLoader(e) for e in ('dev','qa','prod')]"
+      - python -m py_compile $(find src glue emr lambda airflow -name "*.py")
+      - black --check src tests
+      - isort --check-only src tests
+
+  build:
+    commands:
+      # Unit test (Section 26 stage 3)
+      - pytest tests/unit tests/data_quality tests/reconciliation -v --junitxml=reports/unit-tests.xml
+      - pytest tests/integration -v --junitxml=reports/integration-tests.xml
+
+  post_build:
+    commands:
+      # Package (Section 26 stage 4): Glue/EMR scripts, Lambda zips, Airflow
+      # DAGs/plugins, and config are packaged as deployable artifacts. The
+      # actual deploy to Dev/QA/Prod happens in the CodePipeline stages
+      # defined in cicd/pipeline.yaml — this buildspec only builds & tests.
+      - mkdir -p dist/glue dist/emr dist/lambda dist/airflow
+      - cp -r glue/jobs dist/glue/
+      - cp -r emr/jobs dist/emr/
+      - cp -r lambda/*/handler.py dist/lambda/ 2>/dev/null || true
+      - cp -r airflow/dags airflow/plugins dist/airflow/
+      - cp -r config dist/config
+      - cp -r sql dist/sql
+
+artifacts:
+  files:
+    - '**/*'
+  base-directory: dist
+
+reports:
+  unit-tests:
+    files: ['unit-tests.xml']
+    base-directory: reports
+    file-format: JUNITXML
+  integration-tests:
+    files: ['integration-tests.xml']
+    base-directory: reports
+    file-format: JUNITXML

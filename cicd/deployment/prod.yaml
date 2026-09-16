@@ -1,0 +1,13 @@
+# Prod deployment parameters. `approval_required: true` is enforced by the
+# ManualApprovalForProd pipeline stage (cicd/pipeline.yaml) — this flag
+# documents the requirement, it does not itself implement the gate.
+environment: prod
+account_id: "222222222222"
+region: us-east-1
+approval_required: true
+smoke_test_required: false   # Prod validation is post-deployment, not pre-traffic smoke testing
+cloudformation_stack_name: retail-prod-data-lake
+glue_job_config: infrastructure/glue/glue-job-definitions.json
+mwaa_dags_bucket: retail-prod-mwaa-dags
+rollback_on_failure: true
+change_window: "Tue-Thu 09:00-16:00 UTC"

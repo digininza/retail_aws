@@ -1,0 +1,99 @@
+# Schema definitions used for schema validation / evolution classification
+# (Section 24). A change is classified COMPATIBLE, WARNING, or BREAKING by
+# src/data_quality/validators.py::classify_schema_change().
+
+schemas:
+
+  orders:
+    required: [order_id, customer_id, order_date, amount, status]
+    optional: [store_id, promotion_id, channel]
+    types:
+      order_id: string
+      customer_id: string
+      order_date: timestamp
+      amount: decimal
+      status: string
+      store_id: string
+      promotion_id: string
+      channel: string
+
+  order_items:
+    required: [order_item_id, order_id, sku, quantity, unit_price]
+    optional: [discount_pct]
+    types:
+      order_item_id: string
+      order_id: string
+      sku: string
+      quantity: integer
+      unit_price: decimal
+      discount_pct: decimal
+
+  customers_cdc:
+    required: [customer_id, name, email, operation, change_timestamp]
+    optional: [segment, city]
+    types:
+      customer_id: string
+      name: string
+      email: string
+      operation: string
+      change_timestamp: timestamp
+      segment: string
+      city: string
+
+  stores:
+    required: [store_id, store_name, region]
+    optional: [city, format]
+    types:
+      store_id: string
+      store_name: string
+      region: string
+      city: string
+      format: string
+
+  product_master:
+    required: [material_number, product_name, category]
+    optional: [unit_of_measure, brand]
+    types:
+      material_number: string
+      product_name: string
+      category: string
+      unit_of_measure: string
+      brand: string
+
+  pos_sales_events:
+    required: [event_id, store_id, sku, quantity, amount, event_timestamp]
+    optional: [cashier_id, payment_method]
+    types:
+      event_id: string
+      store_id: string
+      sku: string
+      quantity: integer
+      amount: decimal
+      event_timestamp: timestamp
+      cashier_id: string
+      payment_method: string
+
+  ecommerce_events:
+    required: [event_id, event_type, event_timestamp]
+    optional: [customer_id, order_id, sku, session_id]
+    types:
+      event_id: string
+      event_type: string
+      event_timestamp: timestamp
+      customer_id: string
+      order_id: string
+      sku: string
+      session_id: string
+
+# Evolution classification rules applied when comparing incoming batch schema
+# to the registered schema above.
+evolution_rules:
+  new_nullable_column: COMPATIBLE
+  removed_optional_column: COMPATIBLE
+  new_required_column_with_default: WARNING
+  renamed_column: BREAKING
+  datatype_narrowing: BREAKING
+  datatype_widening: WARNING
+  removed_required_column: BREAKING
+  unexpected_extra_column: WARNING
+  missing_required_column: BREAKING

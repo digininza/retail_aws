@@ -1,0 +1,43 @@
+{
+  "_comment": "EXAMPLE bucket policy for retail-data-{environment}. Enforces TLS and denies unencrypted PutObject; principal ARNs are placeholders.",
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DenyInsecureTransport",
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:*",
+      "Resource": [
+        "arn:aws:s3:::retail-data-{environment}",
+        "arn:aws:s3:::retail-data-{environment}/*"
+      ],
+      "Condition": {"Bool": {"aws:SecureTransport": "false"}}
+    },
+    {
+      "Sid": "DenyUnencryptedObjectUploads",
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:PutObject",
+      "Resource": "arn:aws:s3:::retail-data-{environment}/*",
+      "Condition": {"StringNotEquals": {"s3:x-amz-server-side-encryption": "aws:kms"}}
+    },
+    {
+      "Sid": "AllowServiceRolesOnly",
+      "Effect": "Deny",
+      "NotPrincipal": {
+        "AWS": [
+          "arn:aws:iam::000000000000:role/retail-{environment}-glue-execution-role",
+          "arn:aws:iam::000000000000:role/retail-{environment}-emr-execution-role",
+          "arn:aws:iam::000000000000:role/retail-{environment}-lambda-execution-role",
+          "arn:aws:iam::000000000000:role/retail-{environment}-redshift-load-role",
+          "arn:aws:iam::000000000000:root"
+        ]
+      },
+      "Action": "s3:*",
+      "Resource": [
+        "arn:aws:s3:::retail-data-{environment}",
+        "arn:aws:s3:::retail-data-{environment}/*"
+      ]
+    }
+  ]
+}

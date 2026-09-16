@@ -1,0 +1,57 @@
+environment: qa
+
+s3:
+  bucket: retail-data-qa
+  raw_prefix: raw/
+  bronze_prefix: bronze/
+  silver_prefix: silver/
+  gold_prefix: gold/
+  quarantine_prefix: quarantine/
+  archive_prefix: archive/
+  kms_key_alias: alias/retail-qa-data-key
+
+redshift:
+  cluster_identifier: retail-qa-cluster
+  database: retailqa
+  schema_staging: staging
+  schema_curated: curated
+  workload_management_queue: qa_etl
+
+glue:
+  database: retail_qa_catalog
+  execution_role_arn: arn:aws:iam::111111111111:role/retail-qa-glue-execution-role
+  worker_type: G.1X
+  number_of_workers: 8
+  max_concurrent_runs: 5
+
+emr:
+  execution_role_arn: arn:aws:iam::111111111111:role/retail-qa-emr-execution-role
+  instance_type_master: m5.2xlarge
+  instance_type_core: m5.2xlarge
+  core_instance_count: 4
+  release_label: emr-7.1.0
+  ephemeral: true
+
+airflow:
+  environment_name: retail-qa-mwaa
+  dag_concurrency: 16
+  default_retries: 2
+
+kinesis:
+  pos_stream_name: retail-qa-pos-events
+  ecommerce_stream_name: retail-qa-ecommerce-events
+  shard_count: 4
+
+secrets_manager:
+  prefix: retail/qa/
+
+sns:
+  alert_topic_arn: arn:aws:sns:us-east-1:111111111111:retail-qa-pipeline-alerts
+
+logging:
+  level: INFO
+
+feature_flags:
+  enable_emr_heavy_pipeline: true
+  enable_streaming_pipeline: true
+  strict_schema_enforcement: true
